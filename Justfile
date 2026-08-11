@@ -1,36 +1,34 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
 repo := justfile_directory()
-stow_dir := repo + "/.agents"
-home := env_var("HOME")
-target := env_var_or_default("SKILLS_TARGET", home + "/.agents/skills")
+source := repo + "/.agents/skills"
+target := env_var_or_default("SKILLS_TARGET", env_var("HOME") + "/.agents/skills")
 
 # Show available commands.
 default:
     @just --list
 
-# Verify that GNU Stow and the skills package are present.
+# Verify that the source skills directory is present.
 check:
-    @command -v stow >/dev/null || { echo "error: GNU Stow is required; run 'nix develop'" >&2; exit 1; }
-    @test -d "{{stow_dir}}/skills" || { echo "error: {{stow_dir}}/skills does not exist" >&2; exit 1; }
-    @echo "Stow and the skills package are ready."
+    @test -d "{{source}}" || { echo "error: {{source}} does not exist" >&2; exit 1; }
+    @echo "Skills directory is ready."
 
-# Install skills into SKILLS_TARGET (default: ~/.agents/skills).
+# Link the skills directory into SKILLS_TARGET (default: ~/.agents/skills).
 install: check
-    @mkdir -p "{{target}}"
-    stow --dir "{{stow_dir}}" --target "{{target}}" --stow skills
+    @mkdir -p "$(dirname "{{target}}")"
+    @if test -L "{{target}}"; then link=$(readlink "{{target}}"); if test "$link" = "{{source}}"; then echo "Already installed: {{target}}"; exit 0; fi; echo "error: {{target}} links to $link" >&2; exit 1; elif test -e "{{target}}"; then echo "error: {{target}} already exists and is not a symlink" >&2; exit 1; fi; ln -s "{{source}}" "{{target}}"; echo "Linked {{target}} -> {{source}}"
 
-# Preview the links Stow would install.
+# Preview the link without changing it.
 dry-run: check
-    @mkdir -p "{{target}}"
-    stow --dir "{{stow_dir}}" --target "{{target}}" --simulate --verbose=2 --stow skills
+    @echo "LINK: {{target}} -> {{source}}"
 
-# Re-link skills after files or directories change.
-restow: check
-    @mkdir -p "{{target}}"
-    stow --dir "{{stow_dir}}" --target "{{target}}" --restow skills
+# Replace this repository's current skills link.
+relink: check
+    @if test -L "{{target}}"; then link=$(readlink "{{target}}"); if test "$link" = "{{source}}"; then rm "{{target}}"; else echo "error: refusing to replace {{target}} -> $link" >&2; exit 1; fi; elif test -e "{{target}}"; then echo "error: {{target}} exists and is not a symlink" >&2; exit 1; fi
+    @mkdir -p "$(dirname "{{target}}")"
+    @ln -s "{{source}}" "{{target}}"
+    @echo "Linked {{target}} -> {{source}}"
 
-# Remove links installed by Stow, leaving source skills untouched.
+# Remove this repository's skills link.
 uninstall:
-    @command -v stow >/dev/null || { echo "error: GNU Stow is required; run 'nix develop'" >&2; exit 1; }
-    @if test -d "{{target}}"; then stow --dir "{{stow_dir}}" --target "{{target}}" --delete skills; else echo "Nothing to uninstall: {{target}} does not exist."; fi
+    @if test -L "{{target}}"; then link=$(readlink "{{target}}"); if test "$link" = "{{source}}"; then rm "{{target}}"; echo "Removed {{target}}"; else echo "error: refusing to remove {{target}} -> $link" >&2; exit 1; fi; elif test -e "{{target}}"; then echo "error: {{target}} exists and is not a symlink" >&2; exit 1; else echo "Nothing to uninstall."; fi

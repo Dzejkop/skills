@@ -1,5 +1,5 @@
 {
-  description = "Development environment for managing agent skills with GNU Stow";
+  description = "Development environment for managing agent skills";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -23,7 +23,6 @@
             packages = with pkgs; [
               just
               nodejs
-              stow
             ];
           };
         });
