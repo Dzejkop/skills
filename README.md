@@ -10,10 +10,10 @@ just dry-run
 just install
 ```
 
-Keep each skill in its own directory under `skills/`, with its manifest at `skills/<name>/SKILL.md`. Stow links those directories into `~/.agents/skills` by default:
+Keep each skill in its own directory under `.agents/skills/`, with its manifest at `.agents/skills/<name>/SKILL.md`. Stow links those directories into `~/.agents/skills` by default:
 
 ```text
-skills/example/SKILL.md  ->  ~/.agents/skills/example/SKILL.md
+.agents/skills/example/SKILL.md  ->  ~/.agents/skills/example/SKILL.md
 ```
 
 Use a different destination by setting `SKILLS_TARGET`:
