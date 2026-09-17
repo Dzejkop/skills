@@ -124,6 +124,24 @@ When deduplicating, abstract a shared concept, not just similar-looking code. Tw
 
 Distinguish clarifying a concept that exists today from preparing for hypothetical future flexibility. Do not introduce factories, plugin systems, generic frameworks, or configuration switches solely for imagined future needs. When an abstraction needs many flags or caller-specific branches, reconsider whether it represents one concept.
 
+## Code should read top to bottom
+
+A code file is a story - if possible it should read top to bottom. For example:
+
+```rust
+impl Foo {
+  fn foo(&self) -> usize {
+    self.age + 1
+  }
+}
+
+struct Foo {
+    age: usize
+}
+```
+
+is confusing for a human - as I'm reading this code I see first a method on `Foo` but I don't actually know what `Foo` is. The order of these declarations should be flipped!
+
 ## The Boy Scout Rule
 
 Leave the code better than you found it, within the scope of the task.
