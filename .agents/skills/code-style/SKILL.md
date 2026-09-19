@@ -1,18 +1,13 @@
 ---
 name: code-style
-description: Directives for writing high quality, readable code - should always be used if writing production code - does not apply to throwaway or single use scripts
+description: Directives for writing high quality, readable code - should always be used if writing production code
 ---
 
-Write code that makes its behavior, invariants, and failure modes easy to understand. Optimize for the next reader, not for the fewest lines or the most abstractions.
+## Coherence
 
-## Applying this skill
+Coherence of code within a project is an important property. When writing new code, take care to match it against existing code in the project.
 
-Use these guidelines when writing or reviewing production code. They do not require polishing throwaway or single-use scripts.
-
-- Read the surrounding code and repository instructions before making changes. Follow the project's language idioms, formatter, and established conventions rather than introducing a competing style.
-- Apply judgment: these are design guidelines, not quotas for function length, comments, or abstractions.
-- Keep changes proportional to the task. Do not turn a local improvement into an unrelated rewrite.
-- For module interfaces, seams, and deeper architectural decisions, use the `codebase-design` skill alongside this one.
+Important esp. for code review - don't reinvent the wheel, see if the added code is not duplicating some already existing functionality.
 
 ## Naming and readability
 
@@ -21,12 +16,11 @@ Use names that communicate the domain concept and distinguish it from nearby con
 - Use the same term for the same concept throughout a module. Do not alternate between `account`, `customer`, and `user` unless they mean different things.
 - Make units and non-obvious semantics explicit: `timeoutMs`, `expiresAt`, or a duration type rather than an ambiguous number.
 - Name booleans as predicates. Avoid double negatives and boolean arguments whose meaning is invisible at the call site; use named arguments, an enum, or distinct operations when they clarify intent.
-- Prefer straightforward expressions and control flow over clever one-liners, dense chains, or incidental language tricks.
 - Introduce a named constant when it explains a domain rule, unit, or shared policy. Do not give every literal a name merely to eliminate literals.
 
 ## Comments
 
-Comments in code - with the exception of doc comments - should be kept to an **absolute minimum**. Comments in code are justified if they're explaining some difficult concept - or warn against making certain changes to the code in question.
+Comments in code - with the exception of doc comments - should be kept to an **absolute minimum**. Comments in code are justified if they're explaining some tricky concept - or warn against making changes to the code in question.
 
 If present - comments in code should only describe the current state of the code. They should never refer to any previous version of the code.
 
@@ -149,6 +143,8 @@ Leave the code better than you found it, within the scope of the task.
 Improvement often means deletion, not addition. Remove unused code, obsolete workarounds, unnecessary abstractions, misleading or redundant comments, and tests that provide no meaningful protection. Bad code does not need to be preserved merely because it already exists. Verify that apparently unused code has no relevant callers or external contract; when removing a poor implementation, preserve or replace any behavior that is still required. Apply the same judgment to tests: remove noise, not meaningful regression coverage.
 
 Fix nearby naming, stale documentation, or unnecessary complexity when the improvement is clear and low risk. Keep behavior-preserving cleanup distinguishable from behavior changes. Avoid unrelated formatting churn, dependency upgrades, and broad refactors; report larger problems separately rather than silently expanding the task.
+
+If the code you're touching contains TODO or other such comments - it's worth checking out if they've already been resolved. If they've been resovled - flag it.
 
 ## Make Illegal States Unrepresentable
 
